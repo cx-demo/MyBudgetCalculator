@@ -20,9 +20,12 @@ const expenseAmountEl = document.getElementById('expense-amount');
 const addExpenseBtn = document.getElementById('add-expense-btn');
 const expenseListEl = document.getElementById('expense-list');
 
+// Validation error message
+const VALIDATION_ERROR_MESSAGE = 'Please enter a valid description and amount.';
+
 // Generate unique ID
 function generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
 
 // Format currency
@@ -96,7 +99,7 @@ function addIncome() {
     const amount = parseFloat(incomeAmountEl.value);
 
     if (!description || isNaN(amount) || amount <= 0) {
-        alert('Please enter a valid description and amount.');
+        alert(VALIDATION_ERROR_MESSAGE);
         return;
     }
 
@@ -120,7 +123,7 @@ function addExpense() {
     const amount = parseFloat(expenseAmountEl.value);
 
     if (!description || isNaN(amount) || amount <= 0) {
-        alert('Please enter a valid description and amount.');
+        alert(VALIDATION_ERROR_MESSAGE);
         return;
     }
 
@@ -162,11 +165,19 @@ function loadFromLocalStorage() {
     const savedIncomes = localStorage.getItem('budgetIncomes');
     const savedExpenses = localStorage.getItem('budgetExpenses');
 
-    if (savedIncomes) {
-        incomes = JSON.parse(savedIncomes);
-    }
-    if (savedExpenses) {
-        expenses = JSON.parse(savedExpenses);
+    try {
+        if (savedIncomes) {
+            incomes = JSON.parse(savedIncomes);
+        }
+        if (savedExpenses) {
+            expenses = JSON.parse(savedExpenses);
+        }
+    } catch (e) {
+        // If parsing fails, reset to empty arrays
+        incomes = [];
+        expenses = [];
+        localStorage.removeItem('budgetIncomes');
+        localStorage.removeItem('budgetExpenses');
     }
 
     renderIncomeList();
